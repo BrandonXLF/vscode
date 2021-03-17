@@ -109,10 +109,12 @@ interface IRawEditorConfig {
 
 interface IRawConfig {
 	eol?: any;
+	normalizeEOL: any;
 	editor?: IRawEditorConfig;
 }
 
 const DEFAULT_EOL = (platform.isLinux || platform.isMacintosh) ? DefaultEndOfLine.LF : DefaultEndOfLine.CRLF;
+const NORMALIZE_EOL = false;
 
 export interface EditStackPastFutureElements {
 	past: EditStackElement[];
@@ -222,6 +224,11 @@ export class ModelServiceImpl extends Disposable implements IModelService {
 			newDefaultEOL = DefaultEndOfLine.LF;
 		}
 
+		let normalizeEOL = NORMALIZE_EOL;
+		if (typeof config.normalizeEOL !== 'undefined') {
+			normalizeEOL = (config.normalizeEOL === 'false' ? false : Boolean(config.normalizeEOL));
+		}
+
 		let trimAutoWhitespace = EDITOR_MODEL_DEFAULTS.trimAutoWhitespace;
 		if (config.editor && typeof config.editor.trimAutoWhitespace !== 'undefined') {
 			trimAutoWhitespace = (config.editor.trimAutoWhitespace === 'false' ? false : Boolean(config.editor.trimAutoWhitespace));
@@ -244,6 +251,7 @@ export class ModelServiceImpl extends Disposable implements IModelService {
 			insertSpaces: insertSpaces,
 			detectIndentation: detectIndentation,
 			defaultEOL: newDefaultEOL,
+			normalizeEOL: normalizeEOL,
 			trimAutoWhitespace: trimAutoWhitespace,
 			largeFileOptimizations: largeFileOptimizations
 		};
@@ -273,7 +281,8 @@ export class ModelServiceImpl extends Disposable implements IModelService {
 		if (!creationOptions) {
 			const editor = this._configurationService.getValue<IRawEditorConfig>('editor', { overrideIdentifier: language, resource });
 			const eol = this._getEOL(resource, language);
-			creationOptions = ModelServiceImpl._readModelOptions({ editor, eol }, isForSimpleWidget);
+			const normalizeEOL = this._configurationService.getValue<string>('files.normalizeEOL');
+			creationOptions = ModelServiceImpl._readModelOptions({ editor, eol, normalizeEOL }, isForSimpleWidget);
 			this._modelCreationOptionsByLanguageAndResource[language + resource] = creationOptions;
 		}
 		return creationOptions;
@@ -413,7 +422,7 @@ export class ModelServiceImpl extends Disposable implements IModelService {
 
 	public updateModel(model: ITextModel, value: string | ITextBufferFactory): void {
 		const options = this.getCreationOptions(model.getLanguageIdentifier().language, model.uri, model.isForSimpleWidget);
-		const { textBuffer, disposable } = createTextBuffer(value, options.defaultEOL);
+		const { textBuffer, disposable } = createTextBuffer(value, options.defaultEOL, options.normalizeEOL);
 
 		// Return early if the text is already set in that form
 		if (model.equalsTextBuffer(textBuffer)) {

@@ -20,8 +20,7 @@ export class PieceTreeTextBufferFactory implements ITextBufferFactory {
 		private readonly _crlf: number,
 		private readonly _containsRTL: boolean,
 		private readonly _containsUnusualLineTerminators: boolean,
-		private readonly _isBasicASCII: boolean,
-		private readonly _normalizeEOL: boolean
+		private readonly _isBasicASCII: boolean
 	) { }
 
 	private _getEOL(defaultEOL: DefaultEndOfLine): '\r\n' | '\n' {
@@ -39,11 +38,11 @@ export class PieceTreeTextBufferFactory implements ITextBufferFactory {
 		return '\n';
 	}
 
-	public create(defaultEOL: DefaultEndOfLine): { textBuffer: ITextBuffer; disposable: IDisposable; } {
+	public create(defaultEOL: DefaultEndOfLine, normalizeEOL: boolean = true): { textBuffer: ITextBuffer; disposable: IDisposable; } {
 		const eol = this._getEOL(defaultEOL);
 		let chunks = this._chunks;
 
-		if (this._normalizeEOL &&
+		if (normalizeEOL &&
 			((eol === '\r\n' && (this._cr > 0 || this._lf > 0))
 				|| (eol === '\n' && (this._cr > 0 || this._crlf > 0)))
 		) {
@@ -55,7 +54,7 @@ export class PieceTreeTextBufferFactory implements ITextBufferFactory {
 			}
 		}
 
-		const textBuffer = new PieceTreeTextBuffer(chunks, this._bom, eol, this._containsRTL, this._containsUnusualLineTerminators, this._isBasicASCII, this._normalizeEOL);
+		const textBuffer = new PieceTreeTextBuffer(chunks, this._bom, eol, this._containsRTL, this._containsUnusualLineTerminators, this._isBasicASCII, normalizeEOL);
 		return { textBuffer: textBuffer, disposable: textBuffer };
 	}
 
@@ -154,7 +153,7 @@ export class PieceTreeTextBufferBuilder implements ITextBufferBuilder {
 		}
 	}
 
-	public finish(normalizeEOL: boolean = true): PieceTreeTextBufferFactory {
+	public finish(): PieceTreeTextBufferFactory {
 		this._finish();
 		return new PieceTreeTextBufferFactory(
 			this.chunks,
@@ -164,8 +163,7 @@ export class PieceTreeTextBufferBuilder implements ITextBufferBuilder {
 			this.crlf,
 			this.containsRTL,
 			this.containsUnusualLineTerminators,
-			this.isBasicASCII,
-			normalizeEOL
+			this.isBasicASCII
 		);
 	}
 

@@ -193,6 +193,11 @@ configurationRegistry.registerConfiguration({
 			'description': nls.localize('eol', "The default end of line character."),
 			'scope': ConfigurationScope.LANGUAGE_OVERRIDABLE
 		},
+		'file.normalizeEOL': {
+			'type': 'boolean',
+			'default': false,
+			'description': nls.localize('normalizeEOL', "Automatically normalize a files end of line characters when reading from it.")
+		},
 		'files.enableTrash': {
 			'type': 'boolean',
 			'default': true,

@@ -157,8 +157,8 @@ function createTextBuffer(val: string[], normalizeEOL: boolean = true): PieceTre
 	for (const chunk of val) {
 		bufferBuilder.acceptChunk(chunk);
 	}
-	let factory = bufferBuilder.finish(normalizeEOL);
-	return (<PieceTreeTextBuffer>factory.create(DefaultEndOfLine.LF).textBuffer).getPieceTree();
+	let factory = bufferBuilder.finish();
+	return (<PieceTreeTextBuffer>factory.create(DefaultEndOfLine.LF, normalizeEOL).textBuffer).getPieceTree();
 }
 
 function assertTreeInvariants(T: PieceTreeBase): void {

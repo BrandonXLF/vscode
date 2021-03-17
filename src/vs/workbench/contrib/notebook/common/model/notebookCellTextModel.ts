@@ -66,8 +66,8 @@ export class NotebookCellTextModel extends Disposable implements ICell {
 
 		const builder = new PieceTreeTextBufferBuilder();
 		builder.acceptChunk(this._source);
-		const bufferFactory = builder.finish(true);
-		const { textBuffer, disposable } = bufferFactory.create(model.DefaultEndOfLine.LF);
+		const bufferFactory = builder.finish();
+		const { textBuffer, disposable } = bufferFactory.create(model.DefaultEndOfLine.LF, true);
 		this._textBuffer = textBuffer;
 		this._register(disposable);
 

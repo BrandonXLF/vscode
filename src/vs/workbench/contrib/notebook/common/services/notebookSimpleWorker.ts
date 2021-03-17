@@ -23,8 +23,8 @@ class MirrorCell {
 
 		const builder = new PieceTreeTextBufferBuilder();
 		builder.acceptChunk(Array.isArray(this._source) ? this._source.join('\n') : this._source);
-		const bufferFactory = builder.finish(true);
-		this._textBuffer = bufferFactory.create(model.DefaultEndOfLine.LF).textBuffer;
+		const bufferFactory = builder.finish();
+		this._textBuffer = bufferFactory.create(model.DefaultEndOfLine.LF, true).textBuffer;
 
 		return this._textBuffer;
 	}

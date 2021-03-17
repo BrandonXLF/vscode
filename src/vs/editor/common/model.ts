@@ -456,6 +456,7 @@ export interface ITextModelCreationOptions {
 	detectIndentation: boolean;
 	trimAutoWhitespace: boolean;
 	defaultEOL: DefaultEndOfLine;
+	normalizeEOL: boolean;
 	isForSimpleWidget: boolean;
 	largeFileOptimizations: boolean;
 }
@@ -1270,7 +1271,7 @@ export interface ITextBufferBuilder {
  * @internal
  */
 export interface ITextBufferFactory {
-	create(defaultEOL: DefaultEndOfLine): { textBuffer: ITextBuffer; disposable: IDisposable; };
+	create(defaultEOL: DefaultEndOfLine, normalizeEOL?: boolean): { textBuffer: ITextBuffer; disposable: IDisposable; };
 	getFirstLineText(lengthLimit: number): string;
 }
 

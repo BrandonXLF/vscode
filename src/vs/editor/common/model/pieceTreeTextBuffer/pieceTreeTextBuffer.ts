@@ -38,6 +38,7 @@ export class PieceTreeTextBuffer extends Disposable implements ITextBuffer {
 	private _mightContainRTL: boolean;
 	private _mightContainUnusualLineTerminators: boolean;
 	private _mightContainNonBasicASCII: boolean;
+	private _normalizeEOL: boolean;
 
 	private readonly _onDidChangeContent: Emitter<void> = this._register(new Emitter<void>());
 	public readonly onDidChangeContent: Event<void> = this._onDidChangeContent.event;
@@ -49,6 +50,7 @@ export class PieceTreeTextBuffer extends Disposable implements ITextBuffer {
 		this._mightContainRTL = containsRTL;
 		this._mightContainUnusualLineTerminators = containsUnusualLineTerminators;
 		this._pieceTree = new PieceTreeBase(chunks, eol, eolNormalized);
+		this._normalizeEOL = eolNormalized;
 	}
 
 	// #region TextBuffer
@@ -264,7 +266,9 @@ export class PieceTreeTextBuffer extends Disposable implements ITextBuffer {
 
 				const bufferEOL = this.getEOL();
 				const expectedStrEOL = (bufferEOL === '\r\n' ? StringEOL.CRLF : StringEOL.LF);
-				if (strEOL === StringEOL.Unknown || strEOL === expectedStrEOL) {
+				// Normalize EOLs when applying an edit from the editor or when auto normalize is enabled
+				const shouldNormalizeEOL = this._normalizeEOL || op.identifier;
+				if (!shouldNormalizeEOL || strEOL === StringEOL.Unknown || strEOL === expectedStrEOL) {
 					validText = op.text;
 				} else {
 					validText = op.text.replace(/\r\n|\r|\n/g, bufferEOL);

@@ -108,9 +108,9 @@ export function createTextBufferFactoryFromSnapshot(snapshot: model.ITextSnapsho
 	return builder.finish();
 }
 
-export function createTextBuffer(value: string | model.ITextBufferFactory, defaultEOL: model.DefaultEndOfLine): { textBuffer: model.ITextBuffer; disposable: IDisposable; } {
+export function createTextBuffer(value: string | model.ITextBufferFactory, defaultEOL: model.DefaultEndOfLine, normalizeEOL?: boolean): { textBuffer: model.ITextBuffer; disposable: IDisposable; } {
 	const factory = (typeof value === 'string' ? createTextBufferFactory(value) : value);
-	return factory.create(defaultEOL);
+	return factory.create(defaultEOL, normalizeEOL);
 }
 
 let MODEL_ID = 0;
@@ -201,6 +201,7 @@ export class TextModel extends Disposable implements model.ITextModel {
 		insertSpaces: EDITOR_MODEL_DEFAULTS.insertSpaces,
 		detectIndentation: false,
 		defaultEOL: model.DefaultEndOfLine.LF,
+		normalizeEOL: false,
 		trimAutoWhitespace: EDITOR_MODEL_DEFAULTS.trimAutoWhitespace,
 		largeFileOptimizations: EDITOR_MODEL_DEFAULTS.largeFileOptimizations,
 	};
